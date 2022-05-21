@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="style.css" />
     <title>Frontend Mentor | Todo app</title>
   </head>
-  <body>
+  <body data-theme="darkTheme">
     <main>
       <header class="header">
         <div class="container header-container">
@@ -33,47 +33,60 @@
             <h1>TODO</h1>
           </div>
           <div class="light-dark-mode">
-            <img src="images/icon-sun.svg" alt="icon-sun" id="screenLighting" />
+            <img
+              src="images/icon-moon.svg"
+              alt="icon-sun"
+              id="themeProvider"
+              data-theme-icon="darkIconBtn"
+            />
           </div>
         </div>
-        <form class="add-to-do text-container">
+
+        <div class="add-to-do-container">
+          <div class="checkbox-container">
+            <div class="checkbox">
+              <img src="images/icon-check.svg" alt="" />
+            </div>
+          </div>
           <input
             type="text"
             name="Create a new to do"
             id="inputToDo"
-            class="input-todo form-control"
+            class="input-new-todo form-control shadow-none"
             placeholder="Add new to do."
             value=""
             required
             autocomplete="off"
+            spellcheck="false"
           />
-          <input
-            type="submit"
-            value="Add"
-            class="btn btn-primary"
-            id="addToDo"
-          />
-        </form>
+        </div>
       </header>
-      <div class="todo-lists-container">
-        <div class="all-lists">
-          <div class="all-todos" id="allToDos">
-            <!-- <li class="createdList">
-              <div class="to-do">
-                <img
-                  src="images/icon-check.svg"
-                  alt="checkbox button"
-                  class="check"
-                />
-                <div class="indication-paragraph" id="toDo"></div>
-                <img
-                  src="images/icon-cross.svg"
-                  alt="close button"
-                  class="cross-out"
-                />
-              </div>
-            </li> -->
-            <p style="color: white">No to do's for now</p>
+      <div class="to-do-lists-container">
+        <div class="to-do-list">
+          <div class="checkbox-container">
+            <div class="checkbox">
+              <img src="images/icon-check.svg" alt="" />
+            </div>
+          </div>
+          <div class="to-do-text">text</div>
+          <div class="close-button-container">
+            <div class="close-button">
+              <img src="images/icon-cross.svg" alt="" />
+            </div>
+          </div>
+        </div>
+        <div class="to-do-list">
+          <div class="checkbox-container">
+            <div class="checkbox">
+              <img src="images/icon-check.svg" alt="" />
+            </div>
+            <hr />
+          </div>
+          <div class="to-do-text">text</div>
+          <div class="close-button-container">
+            <div class="close-button">
+              <img src="images/icon-cross.svg" alt="" />
+            </div>
           </div>
         </div>
       </div>

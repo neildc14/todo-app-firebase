@@ -149,6 +149,14 @@ h1 {
   outline: none !important;
 }
 
+.warningText {
+  background-color: hsl(0, 0%, 100%);
+}
+
+[data-theme="darkTheme"] .warningText {
+  background-color: hsl(235, 21%, 11%);
+}
+
 /*---to dos container --*/
 .to-do-lists-container {
   position: absolute;
@@ -194,15 +202,14 @@ h1 {
 .close-button-container:hover {
   opacity: 1;
 }
-
+[data-check="completed"].to-do-list .to-do-text {
+  text-decoration: line-through !important;
+}
 .to-do-list .to-do-text {
   padding: 0.375rem 0.75rem;
   overflow-wrap: anywhere;
 }
-[data-check="completed"].to-do-list .to-do-text {
-  text-decoration: line-through !important;
-  color: red !important;
-}
+
 /*filters*/
 .wrapper-mobile {
   padding-top: 0.7rem;

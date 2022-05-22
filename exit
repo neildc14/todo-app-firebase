@@ -1,0 +1,23 @@
+[33mcommit d844504d7f9d4f5b85f35d851940b5a1a3f4ea00[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: neil dela cruz <genoznightmare@gmail.com>
+Date:   Sun May 22 09:37:41 2022 +0800
+
+    auto update list when add new to do is working, delete function is next
+
+[33mcommit 5df6c54bf2acdd6b5d4da45523350bcb00594e09[m
+Author: neil dela cruz <genoznightmare@gmail.com>
+Date:   Sat May 21 23:09:20 2022 +0800
+
+    initial state of loop initiation. need to auto update the list
+
+[33mcommit b18c68c1dbe81cfad2c6163d96be1d26b8a0aab6[m
+Author: neil dela cruz <genoznightmare@gmail.com>
+Date:   Sat May 21 13:14:33 2022 +0800
+
+    done creating the header container, procede to to-do-lists-container
+
+[33mcommit e236fb5dc607285acf2410d09c1f9144c91f976b[m
+Author: neil dela cruz <genoznightmare@gmail.com>
+Date:   Fri May 20 14:56:10 2022 +0800
+
+    phase 1

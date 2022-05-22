@@ -44,54 +44,67 @@ function addNewToDo(event) {
 
 function updateNewTodo() {
   let LOCAL_STORAGE = JSON.parse(localStorage.getItem("data"));
-  console.log(LOCAL_STORAGE);
-
-  function loopTheList() {
-    let htmlElement = "<div>";
-    for (let i = 0; i < LOCAL_STORAGE.length; i++) {
-      htmlElement += `<div class="to-do-list" id="todoListBracket">
-    <div class="checkbox-container">
-      <div class="checkbox">
-        <img
-          src="images/icon-check.svg"
-          alt="checkbox button"
-          id="checkboxBtn"
-        />
-      </div>
-    </div>
-    <div class="to-do-text">${LOCAL_STORAGE[i]}</div>
-    <div class="close-button-container closeBtn" data-close-btn="closeBtn">
-      <div class="close-button">
-        <img src="images/icon-cross.svg" alt="close button" />
-      </div>
-    </div>
-  </div>
-  `;
-    }
-    htmlElement += `<div class="to-do-lists-filters">
-    <p class="to-do-items-left m-0 item-filter">5 items left</p>
-    <div class="to-do-filter-options-desktop">
-      <div class="to-do-filter-all filter">All</div>
-      <div class="to-do-filter-active filter">Active</div>
-      <div class="to-do-filter-all filter">Completed</div>
-    </div>
-    <div class="to-do-filter-clear-completed item-filter">
-      Clear Completed
-    </div>
-  </div>
-  </div>`;
-    htmlElement += "</div>";
-    toDoLists.innerHTML = htmlElement;
-  }
-
-  loopTheList();
-  deleteToDo();
+  loopTheList(LOCAL_STORAGE);
 }
 
-function deleteToDo() {
-  const checkboxBtn = document.getElementById("checkboxBtn");
-  const closeBtn = document.querySelector(".closeBtn");
-  closeBtn.addEventListener("click", crossOutFunction);
+function deleteItem(thisElement) {
+  LOCAL_STORAGE = JSON.parse(localStorage.getItem("data"));
+  let indexElement = thisElement.parentElement.childNodes[3].innerHTML;
 
-  function crossOutFunction() {}
+  LOCAL_STORAGE.splice(LOCAL_STORAGE.indexOf(indexElement), 1);
+  localStorage.setItem("data", JSON.stringify(LOCAL_STORAGE));
+
+  updateNewTodo();
+}
+
+function completedToDoItem(thisElement) {
+  let checkBtnElement = thisElement.parentElement.childNodes[1];
+  let checkBox = checkBtnElement.childNodes[1];
+  let checkBoxImg = checkBox.childNodes[1];
+  let toDoText = thisElement.parentElement.childNodes[3];
+  toDoText.style.cssText =
+    "text-decoration: line-through; color: hsl(234, 11%, 52%)";
+  checkBox.style.cssText =
+    "background-image: linear-gradient(to right, #3f5efb, #46fceb);";
+  checkBoxImg.style.cssText = "opacity: 1";
+}
+
+/*HTML EXECUTION TEMPLATE */
+function loopTheList(element) {
+  let toDoCounter = element.length;
+  let htmlElement = "<div>";
+  for (let i = 0; i < element.length; i++) {
+    htmlElement += `<div class="to-do-list" id="todoListBracket">
+  <div class="checkbox-container" onclick="completedToDoItem(this)">
+    <div class="checkbox">
+      <img
+        src="images/icon-check.svg"
+        alt="checkbox button"
+        id="checkboxBtn"
+      />
+    </div>
+  </div>
+  <div class="to-do-text">${element[i]}</div>
+  <div class="close-button-container closeBtn" onclick="deleteItem(this)">
+    <div class="close-button">
+      <img src="images/icon-cross.svg" alt="close button" />
+    </div>
+  </div>
+</div>
+`;
+  }
+  htmlElement += `<div class="to-do-lists-filters">
+  <p class="to-do-items-left m-0 item-filter">${toDoCounter} items left</p>
+  <div class="to-do-filter-options-desktop">
+    <div class="to-do-filter-all filter">All</div>
+    <div class="to-do-filter-active filter">Active</div>
+    <div class="to-do-filter-all filter">Completed</div>
+  </div>
+  <div class="to-do-filter-clear-completed item-filter">
+    Clear Completed
+  </div>
+</div>
+</div>`;
+  htmlElement += "</div>";
+  toDoLists.innerHTML = htmlElement;
 }

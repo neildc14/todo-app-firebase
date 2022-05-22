@@ -107,14 +107,25 @@ h1 {
   border-radius: 50%;
 }
 
-.checkbox:hover {
+/* .checkbox:hover {
+  background-image: linear-gradient(to right, #3f5efb, #46fceb);
+} */
+
+[data-check="completed"] .checkbox {
   background-image: linear-gradient(to right, #3f5efb, #46fceb);
 }
 
 .checkbox img {
   opacity: 0;
 }
+.checkbox img:hover {
+  opacity: 1;
+  cursor: pointer;
+}
 
+[data-check="completed"] .checkbox img {
+  opacity: 1;
+}
 /* .checkbox:active img {
   opacity: 1;
 } */
@@ -183,11 +194,15 @@ h1 {
 .close-button-container:hover {
   opacity: 1;
 }
+
 .to-do-list .to-do-text {
   padding: 0.375rem 0.75rem;
   overflow-wrap: anywhere;
 }
-
+[data-check="completed"].to-do-list .to-do-text {
+  text-decoration: line-through !important;
+  color: red !important;
+}
 /*filters*/
 .wrapper-mobile {
   padding-top: 0.7rem;

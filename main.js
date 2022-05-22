@@ -50,23 +50,31 @@ function updateNewTodo() {
 function deleteItem(thisElement) {
   LOCAL_STORAGE = JSON.parse(localStorage.getItem("data"));
   let indexElement = thisElement.parentElement.childNodes[3].innerHTML;
-
+  console.log(LOCAL_STORAGE.indexOf(indexElement));
   LOCAL_STORAGE.splice(LOCAL_STORAGE.indexOf(indexElement), 1);
   localStorage.setItem("data", JSON.stringify(LOCAL_STORAGE));
 
   updateNewTodo();
 }
 
-function completedToDoItem(thisElement) {
+function checkToDoItemComplete(thisElement) {
+  LOCAL_STORAGE = JSON.parse(localStorage.getItem("data"));
+  let indexElement = thisElement.parentElement.childNodes[3].innerHTML;
   let checkBtnElement = thisElement.parentElement.childNodes[1];
-  let checkBox = checkBtnElement.childNodes[1];
-  let checkBoxImg = checkBox.childNodes[1];
-  let toDoText = thisElement.parentElement.childNodes[3];
-  toDoText.style.cssText =
-    "text-decoration: line-through; color: hsl(234, 11%, 52%)";
-  checkBox.style.cssText =
-    "background-image: linear-gradient(to right, #3f5efb, #46fceb);";
-  checkBoxImg.style.cssText = "opacity: 1";
+
+  let indexValue = LOCAL_STORAGE.indexOf(indexElement);
+
+  if (checkBtnElement.dataset.check === "incomplete") {
+    completedToDo(indexValue);
+    checkBtnElement.setAttribute("data-check", "completed");
+  } else {
+    console.log("incomplete");
+    checkBtnElement.setAttribute("data-check", "incomplete");
+  }
+}
+
+function completedToDo(index) {
+  console.log(index);
 }
 
 /*HTML EXECUTION TEMPLATE */
@@ -75,7 +83,7 @@ function loopTheList(element) {
   let htmlElement = "<div>";
   for (let i = 0; i < element.length; i++) {
     htmlElement += `<div class="to-do-list" id="todoListBracket">
-  <div class="checkbox-container" onclick="completedToDoItem(this)">
+  <div class="checkbox-container" data-check="incomplete" onclick="checkToDoItemComplete(this)">
     <div class="checkbox">
       <img
         src="images/icon-check.svg"
@@ -84,8 +92,8 @@ function loopTheList(element) {
       />
     </div>
   </div>
-  <div class="to-do-text">${element[i]}</div>
-  <div class="close-button-container closeBtn" onclick="deleteItem(this)">
+  <div class="to-do-text" data-check="incomplete">${element[i]}</div>
+  <div class="close-button-container closeBtn" data-active="false" onclick="deleteItem(this)">
     <div class="close-button">
       <img src="images/icon-cross.svg" alt="close button" />
     </div>

@@ -44,3 +44,12 @@ The designs were created to the following widths:
 
 - Family: [Josefin Sans](https://fonts.google.com/specimen/Josefin+Sans)
 - Weights: 400, 700
+
+// LOCAL_STORAGE.forEach(addToLists);
+
+// function addToLists(currentValue, index) {
+// console.log(currentValue, index);
+// let htmlElement = `<div class="to-do-list" id="todoListBracket"> // <div class="checkbox-container"> // <div class="checkbox"> // <img // src="images/icon-check.svg" // alt="checkbox button" // id="checkboxBtn" // /> // </div> // </div> // <div class="to-do-text">${currentValue}${index}</div> // <div class="close-button-container" id="closeBtn"> // <div class="close-button"> // <img src="images/icon-cross.svg" alt="close button" /> // </div> // </div> // </div>`;
+
+// toDoLists.innerHTML = htmlElement;
+// }

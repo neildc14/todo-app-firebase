@@ -1,7 +1,7 @@
+//globals
 const themeProviderBtn = document.getElementById("themeProvider");
 const body = document.querySelector("body");
 const header = document.querySelector("header");
-
 const toDoLists = document.getElementById("toDoLists");
 const todoListBracket = document.getElementById("odoListBracket");
 
@@ -34,41 +34,22 @@ function addNewToDo(event) {
 
     let old_todo = JSON.parse(localStorage.getItem("data"));
     old_todo.push(NEW_TODO_VALUE);
+
     localStorage.setItem("data", JSON.stringify(old_todo));
     inputNewToDo.value = "";
+
+    updateNewTodo();
   }
 }
 
-let LOCAL_STORAGE = JSON.parse(localStorage.getItem("data"));
-console.log(LOCAL_STORAGE);
-// LOCAL_STORAGE.forEach(addToLists);
+function updateNewTodo() {
+  let LOCAL_STORAGE = JSON.parse(localStorage.getItem("data"));
+  console.log(LOCAL_STORAGE);
 
-// function addToLists(currentValue, index) {
-//   console.log(currentValue, index);
-//   let htmlElement = `<div class="to-do-list" id="todoListBracket">
-//   <div class="checkbox-container">
-//     <div class="checkbox">
-//       <img
-//         src="images/icon-check.svg"
-//         alt="checkbox button"
-//         id="checkboxBtn"
-//       />
-//     </div>
-//   </div>
-//   <div class="to-do-text">${currentValue}${index}</div>
-//   <div class="close-button-container" id="closeBtn">
-//     <div class="close-button">
-//       <img src="images/icon-cross.svg" alt="close button" />
-//     </div>
-//   </div>
-// </div>`;
-
-//   toDoLists.innerHTML = htmlElement;
-// }
-function loop() {
-  let htmlElement = "<div>";
-  for (let i = 0; i < LOCAL_STORAGE.length; i++) {
-    htmlElement += `<div class="to-do-list" id="todoListBracket">
+  function loopTheList() {
+    let htmlElement = "<div>";
+    for (let i = 0; i < LOCAL_STORAGE.length; i++) {
+      htmlElement += `<div class="to-do-list" id="todoListBracket">
     <div class="checkbox-container">
       <div class="checkbox">
         <img
@@ -86,8 +67,8 @@ function loop() {
     </div>
   </div>
   `;
-  }
-  htmlElement += `<div class="to-do-lists-filters">
+    }
+    htmlElement += `<div class="to-do-lists-filters">
     <p class="to-do-items-left m-0 item-filter">5 items left</p>
     <div class="to-do-filter-options-desktop">
       <div class="to-do-filter-all filter">All</div>
@@ -99,19 +80,18 @@ function loop() {
     </div>
   </div>
   </div>`;
-  htmlElement += "</div>";
-  toDoLists.innerHTML = htmlElement;
+    htmlElement += "</div>";
+    toDoLists.innerHTML = htmlElement;
+  }
+
+  loopTheList();
+  deleteToDo();
 }
 
-loop();
+function deleteToDo() {
+  const checkboxBtn = document.getElementById("checkboxBtn");
+  const closeBtn = document.querySelector(".closeBtn");
+  closeBtn.addEventListener("click", crossOutFunction);
 
-/*closeBtn function */
-const checkboxBtn = document.getElementById("checkboxBtn");
-const closeBtn = document.querySelector(".closeBtn");
-closeBtn.addEventListener("click", crossOutFunction);
-
-function crossOutFunction() {
-  this.parentElement.style.display = "none";
-  console.log(this.parentElement);
-  localStorage.removeItem("data");
+  function crossOutFunction() {}
 }

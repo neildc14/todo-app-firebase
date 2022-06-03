@@ -14,9 +14,11 @@ if the close button is clicked then it must delete from all and update the array
 
 //active list
 //all active list is filtered (those all that unchecked)
+//all completed is filtered
 
 //clear completed
 if clear then it ask if the user is sure to delete and then when the prompt pops up it triggers event that delete the completed lists
-* create an array that add all the compeleted lists and then compare it to the localstorage to delete all using filters ig uess
+
+- create an array that add all the compeleted lists and then compare it to the localstorage to delete all using filters ig uess
 
 //the item left indicator counts all the active in array

@@ -202,6 +202,7 @@ h1 {
 .close-button-container:hover {
   opacity: 1;
 }
+
 [data-check="completed"].to-do-list .to-do-text {
   text-decoration: line-through !important;
 }

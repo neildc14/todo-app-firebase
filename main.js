@@ -1,11 +1,11 @@
 //globals
-const themeProviderBtn = document.getElementById("themeProvider");
-const body = document.querySelector("body");
-const header = document.querySelector("header");
-const toDoLists = document.getElementById("toDoLists");
-const todoListBracket = document.getElementById("odoListBracket");
-const warningText = document.getElementById("warningText");
-const inputNewToDo = document.getElementById("inputNewToDo");
+let themeProviderBtn = document.getElementById("themeProvider");
+let body = document.querySelector("body");
+let header = document.querySelector("header");
+let toDoLists = document.getElementById("toDoLists");
+let todoListBracket = document.getElementById("odoListBracket");
+let warningText = document.getElementById("warningText");
+let inputNewToDo = document.getElementById("inputNewToDo");
 
 /*themprovider */
 themeProviderBtn.addEventListener("click", themeProviderFunc);
@@ -25,41 +25,72 @@ inputNewToDo.addEventListener("keypress", addNewToDo);
 
 function addNewToDo(event) {
   if (inputNewToDo.value !== "" && event.key === "Enter") {
-    inputNewToDo.value.toLowerCase();
+    let newInput = inputNewToDo.value.toLowerCase();
+
+    const timestamp = firebase.firestore.FieldValue.serverTimestamp;
+
+    db.collection("todos")
+      .add({
+        todo: newInput,
+        status: "active",
+        createdAt: timestamp(),
+      })
+      .then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+
+    inputNewToDo.value = "";
+
+    getItemFromDatabase();
   }
 }
 
-htmlElement += `<div class="to-do-list" 
+function getItemFromDatabase() {
+  db.collection("todos")
+    .get()
+    .then((querySnapshot) => {
+      let docItems = [];
+      querySnapshot.forEach((doc) => {
+        docItems.push({ id: doc.id, ...doc.data() });
+        renderDocument(docItems);
+      });
+    });
+}
+getItemFromDatabase();
+
+function renderDocument(docItem) {
+  let htmlElement = "<div>";
+  docItem.map((doc) => {
+    htmlElement += `<div class="to-do-list"
     id="todoListBracket">
-  <div class="checkbox-container" 
-  data-check="incomplete" 
-  onclick="checkToDoItemComplete(this)">
-    <div class="checkbox">
+  <div class="checkbox-container">
+    <div class="checkbox ${
+      doc.status == "completed" ? "check-filled" : ""
+    }" data-id=${doc.id}>
       <img
         src="images/icon-check.svg"
         alt="checkbox button"
-        id="checkboxBtn"
+        class="${doc.status == "completed" ? "check-image" : ""}"
       />
     </div>
-  </div>
-  <div class="to-do-text" data-check="incomplete">
-  ${element[i]}</div>
-  <div class="close-button-container"
-  id="closeBtn" 
-  data-active="false" 
-  onclick="deleteItem(this)">
-    <div class="close-button">
-      <img src="images/icon-cross.svg" 
+  </div> 
+  <div class="to-do-text  ${
+    doc.status == "completed" ? "check-text" : ""
+  }" data-check="incomplete">
+  ${doc.todo}</div>
+  <div class="close-button-container">
+    <div class="close-button" data-id=${doc.id}>
+      <img src="images/icon-cross.svg"
       alt="close button" />
     </div>
   </div>
-</div>
-`;
-
-htmlElement += `<div class="to-do-lists-filters">
-  <p class="to-do-items-left m-0 item-filter">
-  ${toDoCounter} 
-  items left</p>
+</div>`;
+  });
+  htmlElement += `<div class="to-do-lists-filters">
+  <p class="to-do-items-left m-0 item-filter">${docItem.length} item(s) left</p>
   <div class="to-do-filter-options-desktop">
     <div class="to-do-filter-all filter">All</div>
     <div class="to-do-filter-active filter">Active</div>
@@ -70,5 +101,59 @@ htmlElement += `<div class="to-do-lists-filters">
   </div>
 </div>
 </div>`;
-htmlElement += "</div>";
-toDoLists.innerHTML = htmlElement;
+  toDoLists.innerHTML = htmlElement;
+  createEventListeners();
+}
+
+function createEventListeners() {
+  let closeBtns = document.querySelectorAll(".close-button");
+  let checkMarks = document.querySelectorAll(".checkbox");
+  closeBtns.forEach((closeBtn) => {
+    closeBtn.addEventListener("click", () => {
+      deleteItem(closeBtn.dataset.id);
+    });
+  });
+
+  checkMarks.forEach((checkMark) => {
+    checkMark.addEventListener("click", () => {
+      completedItem(checkMark.dataset.id);
+    });
+  });
+}
+
+function deleteItem(id) {
+  console.log("click");
+  db.collection("todos")
+    .doc(id)
+    .delete()
+    .then(() => {
+      console.log("Document successfully deleted!");
+      getItemFromDatabase();
+    })
+    .catch((error) => {
+      console.error("Error removing document: ", error);
+    });
+}
+
+function completedItem(id) {
+  var toDosRef = db.collection("todos").doc(id);
+  toDosRef.get().then((doc) => {
+    if (doc.exists) {
+      let status = doc.data().status;
+
+      if (status === "active") {
+        toDosRef.update({
+          status: "completed",
+        });
+
+        getItemFromDatabase();
+      } else if (status === "completed") {
+        toDosRef.update({
+          status: "active",
+        });
+
+        getItemFromDatabase();
+      }
+    }
+  });
+}

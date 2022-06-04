@@ -21,6 +21,11 @@ body::-webkit-scrollbar {
 [data-theme="darkTheme"] {
   background-color: hsl(235, 21%, 11%) !important;
   color: hsl(234, 39%, 85%);
+  transition: all 0.7s ease-in-out;
+}
+
+[data-theme="lightTheme"] {
+  transition: all 0.7s ease-in-out;
 }
 
 header {
@@ -111,7 +116,7 @@ h1 {
   background-image: linear-gradient(to right, #3f5efb, #46fceb);
 } */
 
-[data-check="completed"] .checkbox {
+.check-filled {
   background-image: linear-gradient(to right, #3f5efb, #46fceb);
 }
 
@@ -123,8 +128,9 @@ h1 {
   cursor: pointer;
 }
 
-[data-check="completed"] .checkbox img {
+.check-image {
   opacity: 1;
+  z-index: 1;
 }
 /* .checkbox:active img {
   opacity: 1;
@@ -147,14 +153,6 @@ h1 {
 .input-new-todo:active {
   border: none !important;
   outline: none !important;
-}
-
-.warningText {
-  background-color: hsl(0, 0%, 100%);
-}
-
-[data-theme="darkTheme"] .warningText {
-  background-color: hsl(235, 21%, 11%);
 }
 
 /*---to dos container --*/
@@ -203,8 +201,9 @@ h1 {
   opacity: 1;
 }
 
-[data-check="completed"].to-do-list .to-do-text {
+.check-text {
   text-decoration: line-through !important;
+  color: hsl(234, 11%, 52%);
 }
 .to-do-list .to-do-text {
   padding: 0.375rem 0.75rem;
@@ -264,6 +263,6 @@ h1 {
 }
 
 .filter:hover,
-.filter:active {
+.filter-active {
   color: hsl(240, 88%, 43%);
 }

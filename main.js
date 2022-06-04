@@ -43,27 +43,30 @@ function addNewToDo(event) {
       });
 
     inputNewToDo.value = "";
-
-    getItemFromDatabase();
   }
 }
 
 function getItemFromDatabase() {
-  db.collection("todos")
-    .get()
-    .then((querySnapshot) => {
-      let docItems = [];
-      querySnapshot.forEach((doc) => {
-        docItems.push({ id: doc.id, ...doc.data() });
-        renderDocument(docItems);
-      });
+  db.collection("todos").onSnapshot((querySnapshot) => {
+    let docItems = [];
+    querySnapshot.forEach((doc) => {
+      docItems.push({ id: doc.id, ...doc.data() });
+      renderDocument(docItems);
     });
+  });
 }
+
 getItemFromDatabase();
 
 function renderDocument(docItem) {
   let htmlElement = "<div>";
+  let completed = [];
+
   docItem.map((doc) => {
+    if (doc.status === "completed") {
+      completed.push(doc.status);
+    }
+
     htmlElement += `<div class="to-do-list"
     id="todoListBracket">
   <div class="checkbox-container">
@@ -73,7 +76,6 @@ function renderDocument(docItem) {
       <img
         src="images/icon-check.svg"
         alt="checkbox button"
-        class="${doc.status == "completed" ? "check-image" : ""}"
       />
     </div>
   </div> 
@@ -90,7 +92,9 @@ function renderDocument(docItem) {
 </div>`;
   });
   htmlElement += `<div class="to-do-lists-filters">
-  <p class="to-do-items-left m-0 item-filter">${docItem.length} item(s) left</p>
+  <p class="to-do-items-left m-0 item-filter">${
+    docItem.length - completed.length
+  } item(s) left</p>
   <div class="to-do-filter-options-desktop">
     <div class="to-do-filter-all filter">All</div>
     <div class="to-do-filter-active filter">Active</div>
@@ -157,3 +161,8 @@ function completedItem(id) {
     }
   });
 }
+
+//filters
+// const filters = () => {};
+
+// filters();

@@ -64,7 +64,7 @@ function renderDocument(docItem) {
 
   docItem.map((doc) => {
     if (doc.status === "completed") {
-      completed.push(doc.status);
+      completed.push(doc);
     }
 
     htmlElement += `<div class="to-do-list"
@@ -109,24 +109,33 @@ function renderDocument(docItem) {
   createEventListeners();
 }
 
-function createEventListeners() {
+const createEventListeners = () => {
   let closeBtns = document.querySelectorAll(".close-button");
-  let checkMarks = document.querySelectorAll(".checkbox");
+  let checkMarksBtn = document.querySelectorAll(".checkbox");
+  let clearCompleteBtn = document.querySelectorAll(
+    ".to-do-filter-clear-completed"
+  );
+
   closeBtns.forEach((closeBtn) => {
     closeBtn.addEventListener("click", () => {
       deleteItem(closeBtn.dataset.id);
     });
   });
 
-  checkMarks.forEach((checkMark) => {
+  checkMarksBtn.forEach((checkMark) => {
     checkMark.addEventListener("click", () => {
       completedItem(checkMark.dataset.id);
     });
   });
-}
+
+  clearCompleteBtn.forEach((clearComplete) => {
+    clearComplete.addEventListener("click", () => {
+      clearCompleted();
+    });
+  });
+};
 
 function deleteItem(id) {
-  console.log("click");
   db.collection("todos")
     .doc(id)
     .delete()
@@ -162,7 +171,16 @@ function completedItem(id) {
   });
 }
 
-//filters
-// const filters = () => {};
-
-// filters();
+function clearCompleted() {
+  db.collection("todos")
+    .where("status", "==", "completed")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        doc.ref.delete();
+      });
+    })
+    .catch((error) => {
+      console.log("Error getting documents: ", error);
+    });
+}

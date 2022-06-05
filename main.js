@@ -262,7 +262,6 @@ function completedFunction() {
       querySnapshot.forEach((doc) => {
         completedItem.push({ id: doc.id, ...doc.data() });
         renderDocument(completedItem);
-        console.log(completedItem);
       });
     })
     .catch((error) => {

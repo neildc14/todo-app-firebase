@@ -194,8 +194,13 @@ const filters = () => {
     all.classList.add("filter-active");
     all.addEventListener("click", function () {
       all.classList.add("filter-active");
+      filterActive.forEach((active) => {
+        active.classList.remove("filter-active");
+      });
+      filterComplete.forEach((complete) => {
+        complete.classList.remove("filter-active");
+      });
 
-      removeFilter();
       allFunction();
     });
   });
@@ -223,21 +228,10 @@ const filters = () => {
       filterActive.forEach((active) => {
         active.classList.remove("filter-active");
       });
+      completedFunction();
     });
   });
-
-  function removeFilter() {
-    filterActive.forEach((active) => {
-      active.classList.remove("filter-active");
-    });
-    filterComplete.forEach((complete) => {
-      complete.classList.remove("filter-active");
-    });
-  }
-  removeFilter();
 };
-
-filters();
 
 function allFunction() {
   getItemFromDatabase();
@@ -245,14 +239,35 @@ function allFunction() {
 
 function activeFunction() {
   db.collection("todos")
-    .where("status", "==", "completed")
+    .where("status", "==", "active")
     .get()
     .then((querySnapshot) => {
+      let activeItem = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
+        activeItem.push({ id: doc.id, ...doc.data() });
+        renderDocument(activeItem);
       });
     })
     .catch((error) => {
       console.log("Error getting documents: ", error);
     });
 }
+
+function completedFunction() {
+  db.collection("todos")
+    .where("status", "==", "completed")
+    .get()
+    .then((querySnapshot) => {
+      let completedItem = [];
+      querySnapshot.forEach((doc) => {
+        completedItem.push({ id: doc.id, ...doc.data() });
+        renderDocument(completedItem);
+        console.log(completedItem);
+      });
+    })
+    .catch((error) => {
+      console.log("Error getting documents: ", error);
+    });
+}
+
+filters();

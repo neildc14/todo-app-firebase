@@ -51,7 +51,9 @@ function getItemFromDatabase() {
     let docItems = [];
     querySnapshot.forEach((doc) => {
       docItems.push({ id: doc.id, ...doc.data() });
-      renderDocument(docItems);
+      if (docItems.length > 0) {
+        renderDocument(docItems);
+      }
     });
   });
 }
@@ -91,6 +93,7 @@ function renderDocument(docItem) {
       </div>
     </div>`;
   });
+
   htmlElement += `<div class="to-do-lists-filters">
     <p class="to-do-items-left m-0 item-filter">${
       docItem.length - completed.length
@@ -238,35 +241,44 @@ function allFunction() {
 }
 
 function activeFunction() {
-  db.collection("todos")
-    .where("status", "==", "active")
-    .get()
-    .then((querySnapshot) => {
-      let activeItem = [];
-      querySnapshot.forEach((doc) => {
-        activeItem.push({ id: doc.id, ...doc.data() });
-        renderDocument(activeItem);
+  let activeItem = [];
+  if (activeItem.length !== null || activeItem.length !== 0) {
+    db.collection("todos")
+      .where("status", "==", "active")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          activeItem.push({ id: doc.id, ...doc.data() });
+          renderDocument(activeItem);
+        });
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
       });
-    })
-    .catch((error) => {
-      console.log("Error getting documents: ", error);
-    });
+  } else if (activeItem.length === null || activeItem.length === 0) {
+    renderDocument(activeItem);
+  }
 }
 
 function completedFunction() {
-  db.collection("todos")
-    .where("status", "==", "completed")
-    .get()
-    .then((querySnapshot) => {
-      let completedItem = [];
-      querySnapshot.forEach((doc) => {
-        completedItem.push({ id: doc.id, ...doc.data() });
-        renderDocument(completedItem);
+  let completedItem = [];
+  if (completedItem.length !== null || completedItem.length !== 0) {
+    db.collection("todos")
+      .where("status", "==", "completed")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          completedItem.push({ id: doc.id, ...doc.data() });
+
+          renderDocument(completedItem);
+        });
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
       });
-    })
-    .catch((error) => {
-      console.log("Error getting documents: ", error);
-    });
+  } else if (completedItem.length === null || completedItem.length === 0) {
+    renderDocument(completedItem);
+  }
 }
 
 filters();

@@ -69,41 +69,41 @@ function renderDocument(docItem) {
 
     htmlElement += `<div class="to-do-list"
     id="todoListBracket">
-  <div class="checkbox-container">
-    <div class="checkbox ${
-      doc.status == "completed" ? "check-filled" : ""
-    }" data-id=${doc.id}>
-      <img
-        src="images/icon-check.svg"
-        alt="checkbox button"
-      />
-    </div>
-  </div> 
-  <div class="to-do-text  ${
-    doc.status == "completed" ? "check-text" : ""
-  }" data-check="incomplete">
-  ${doc.todo}</div>
-  <div class="close-button-container">
-    <div class="close-button" data-id=${doc.id}>
-      <img src="images/icon-cross.svg"
-      alt="close button" />
-    </div>
-  </div>
-</div>`;
+      <div class="checkbox-container">
+        <div class="checkbox ${
+          doc.status == "completed" ? "check-filled" : ""
+        }" data-id=${doc.id}>
+          <img
+            src="images/icon-check.svg"
+            alt="checkbox button"
+          />
+        </div>
+      </div> 
+      <div class="to-do-text  ${
+        doc.status == "completed" ? "check-text" : ""
+      }" data-check="incomplete">
+      ${doc.todo}</div>
+      <div class="close-button-container">
+        <div class="close-button" data-id=${doc.id}>
+          <img src="images/icon-cross.svg"
+          alt="close button" />
+        </div>
+      </div>
+    </div>`;
   });
   htmlElement += `<div class="to-do-lists-filters">
-  <p class="to-do-items-left m-0 item-filter">${
-    docItem.length - completed.length
-  } item(s) left</p>
-  <div class="to-do-filter-options-desktop">
-    <div class="to-do-filter-all filter">All</div>
-    <div class="to-do-filter-active filter">Active</div>
-    <div class="to-do-filter-all filter">Completed</div>
+    <p class="to-do-items-left m-0 item-filter">${
+      docItem.length - completed.length
+    } item(s) left</p>
+    <div class="to-do-filter-options-desktop">
+      <div class="to-do-filter-all filter">All</div>
+      <div class="to-do-filter-active filter">Active</div>
+      <div class="to-do-filter-complete filter">Completed</div>
+    </div>
+    <div class="to-do-filter-clear-completed item-filter">
+      Clear Completed
+    </div>
   </div>
-  <div class="to-do-filter-clear-completed item-filter">
-    Clear Completed
-  </div>
-</div>
 </div>`;
   toDoLists.innerHTML = htmlElement;
   createEventListeners();
@@ -178,6 +178,78 @@ function clearCompleted() {
     .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
         doc.ref.delete();
+      });
+    })
+    .catch((error) => {
+      console.log("Error getting documents: ", error);
+    });
+}
+
+const filters = () => {
+  let filterAll = document.querySelectorAll(".to-do-filter-all");
+  let filterActive = document.querySelectorAll(".to-do-filter-active");
+  let filterComplete = document.querySelectorAll(".to-do-filter-complete");
+
+  filterAll.forEach((all) => {
+    all.classList.add("filter-active");
+    all.addEventListener("click", function () {
+      all.classList.add("filter-active");
+
+      removeFilter();
+      allFunction();
+    });
+  });
+
+  filterActive.forEach((active) => {
+    active.addEventListener("click", function () {
+      active.classList.add("filter-active");
+      filterAll.forEach((all) => {
+        all.classList.remove("filter-active");
+      });
+      filterComplete.forEach((complete) => {
+        complete.classList.remove("filter-active");
+      });
+
+      activeFunction();
+    });
+  });
+
+  filterComplete.forEach((complete) => {
+    complete.addEventListener("click", function () {
+      complete.classList.add("filter-active");
+      filterAll.forEach((all) => {
+        all.classList.remove("filter-active");
+      });
+      filterActive.forEach((active) => {
+        active.classList.remove("filter-active");
+      });
+    });
+  });
+
+  function removeFilter() {
+    filterActive.forEach((active) => {
+      active.classList.remove("filter-active");
+    });
+    filterComplete.forEach((complete) => {
+      complete.classList.remove("filter-active");
+    });
+  }
+  removeFilter();
+};
+
+filters();
+
+function allFunction() {
+  getItemFromDatabase();
+}
+
+function activeFunction() {
+  db.collection("todos")
+    .where("status", "==", "completed")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
       });
     })
     .catch((error) => {

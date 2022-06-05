@@ -256,6 +256,7 @@ h1 {
   color: hsl(236, 9%, 61%);
   cursor: pointer;
 }
+
 .filter {
   font-weight: 700;
   color: hsl(236, 9%, 61%);
@@ -265,4 +266,18 @@ h1 {
 .filter:hover,
 .filter-active {
   color: hsl(240, 88%, 43%);
+}
+
+.hide-todo {
+  display: none;
+}
+
+.name-text {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: -1;
+  color: hsl(236, 9%, 61%);
+  font-weight: 300;
 }

@@ -47,15 +47,17 @@ function addNewToDo(event) {
 }
 
 function getItemFromDatabase() {
-  db.collection("todos").onSnapshot((querySnapshot) => {
-    let docItems = [];
-    querySnapshot.forEach((doc) => {
-      docItems.push({ id: doc.id, ...doc.data() });
-      if (docItems.length > 0) {
-        renderDocument(docItems);
-      }
+  db.collection("todos")
+    .orderBy("createdAt", "asc")
+    .onSnapshot((querySnapshot) => {
+      let docItems = [];
+      querySnapshot.forEach((doc) => {
+        docItems.push({ id: doc.id, ...doc.data() });
+        if (docItems.length > 0) {
+          renderDocument(docItems);
+        }
+      });
     });
-  });
 }
 
 getItemFromDatabase();
@@ -183,6 +185,10 @@ function clearCompleted() {
         doc.ref.delete();
       });
     })
+    .then(() => {
+      console.log("Clear Successful");
+      getItemFromDatabase();
+    })
     .catch((error) => {
       console.log("Error getting documents: ", error);
     });
@@ -236,49 +242,34 @@ const filters = () => {
   });
 };
 
+filters();
+
 function allFunction() {
   getItemFromDatabase();
 }
 
 function activeFunction() {
-  let activeItem = [];
-  if (activeItem.length !== null || activeItem.length !== 0) {
-    db.collection("todos")
-      .where("status", "==", "active")
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          activeItem.push({ id: doc.id, ...doc.data() });
-          renderDocument(activeItem);
-        });
-      })
-      .catch((error) => {
-        console.log("Error getting documents: ", error);
+  db.collection("todos")
+    .where("status", "==", "active")
+    .orderBy("createdAt", "asc")
+    .onSnapshot((querySnapshot) => {
+      let activeItem = [];
+      querySnapshot.forEach((doc) => {
+        activeItem.push({ id: doc.id, ...doc.data() });
+        renderDocument(activeItem);
       });
-  } else if (activeItem.length === null || activeItem.length === 0) {
-    renderDocument(activeItem);
-  }
+    });
 }
 
 function completedFunction() {
-  let completedItem = [];
-  if (completedItem.length !== null || completedItem.length !== 0) {
-    db.collection("todos")
-      .where("status", "==", "completed")
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          completedItem.push({ id: doc.id, ...doc.data() });
-
-          renderDocument(completedItem);
-        });
-      })
-      .catch((error) => {
-        console.log("Error getting documents: ", error);
+  db.collection("todos")
+    .where("status", "==", "completed")
+    .orderBy("createdAt", "asc")
+    .onSnapshot((querySnapshot) => {
+      let completedItem = [];
+      querySnapshot.forEach((doc) => {
+        completedItem.push({ id: doc.id, ...doc.data() });
+        renderDocument(completedItem);
       });
-  } else if (completedItem.length === null || completedItem.length === 0) {
-    renderDocument(completedItem);
-  }
+    });
 }
-
-filters();

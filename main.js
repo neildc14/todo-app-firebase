@@ -46,16 +46,17 @@ function addNewToDo(event) {
   }
 }
 
+inputNewToDo.removeEventListener("keyup", addNewToDo);
+
 function getItemFromDatabase() {
   db.collection("todos")
     .orderBy("createdAt", "asc")
     .onSnapshot((querySnapshot) => {
+      if (querySnapshot.size === 0) return renderDefaultDocument();
       let docItems = [];
       querySnapshot.forEach((doc) => {
         docItems.push({ id: doc.id, ...doc.data() });
-        if (docItems.length > 0) {
-          renderDocument(docItems);
-        }
+        return renderDocument(docItems);
       });
     });
 }
@@ -114,6 +115,23 @@ function renderDocument(docItem) {
   createEventListeners();
 }
 
+function renderDefaultDocument() {
+  let htmlElement = `<div>
+    <div class="to-do-lists-filters">
+      <p class="to-do-items-left m-0 item-filter"> 0 item(s) left</p>
+      <div class="to-do-filter-options-desktop">
+        <div class="to-do-filter-all filter">All</div>
+        <div class="to-do-filter-active filter">Active</div>
+        <div class="to-do-filter-complete filter">Completed</div>
+      </div>
+      <div class="to-do-filter-clear-completed item-filter">
+        Clear Completed
+      </div>
+    </div>
+  </div>`;
+  toDoLists.innerHTML = htmlElement;
+}
+
 const createEventListeners = () => {
   let closeBtns = document.querySelectorAll(".close-button");
   let checkMarksBtn = document.querySelectorAll(".checkbox");
@@ -146,7 +164,6 @@ function deleteItem(id) {
     .delete()
     .then(() => {
       console.log("Document successfully deleted!");
-      getItemFromDatabase();
     })
     .catch((error) => {
       console.error("Error removing document: ", error);
@@ -164,17 +181,13 @@ function completedItem(id) {
           status: "completed",
         });
 
-        getItemFromDatabase();
-        activeFunction();
-        completedFunction();
+        filters();
       } else if (status === "completed") {
         toDosRef.update({
           status: "active",
         });
 
-        getItemFromDatabase();
-        activeFunction();
-        completedFunction();
+        filters();
       }
     }
   });
@@ -198,79 +211,89 @@ function clearCompleted() {
     });
 }
 
-let filterAll = document.querySelectorAll(".to-do-filter-all");
-let filterActive = document.querySelectorAll(".to-do-filter-active");
-let filterComplete = document.querySelectorAll(".to-do-filter-complete");
+const filters = () => {
+  let filterAll = document.querySelectorAll(".to-do-filter-all");
+  let filterActive = document.querySelectorAll(".to-do-filter-active");
+  let filterComplete = document.querySelectorAll(".to-do-filter-complete");
 
-filterAll.forEach((all) => {
-  all.classList.add("filter-active");
-  all.addEventListener("click", function () {
+  filterAll.forEach((all) => {
     all.classList.add("filter-active");
-    filterActive.forEach((active) => {
-      active.classList.remove("filter-active");
-    });
-    filterComplete.forEach((complete) => {
-      complete.classList.remove("filter-active");
-    });
-
-    allFunction();
-  });
-});
-
-filterActive.forEach((active) => {
-  active.addEventListener("click", function () {
-    active.classList.add("filter-active");
-    filterAll.forEach((all) => {
-      all.classList.remove("filter-active");
-    });
-    filterComplete.forEach((complete) => {
-      complete.classList.remove("filter-active");
-    });
-
-    activeFunction();
-  });
-});
-
-filterComplete.forEach((complete) => {
-  complete.addEventListener("click", function () {
-    complete.classList.add("filter-active");
-    filterAll.forEach((all) => {
-      all.classList.remove("filter-active");
-    });
-    filterActive.forEach((active) => {
-      active.classList.remove("filter-active");
-    });
-    completedFunction();
-  });
-});
-
-function allFunction() {
-  getItemFromDatabase();
-}
-
-function activeFunction() {
-  db.collection("todos")
-    .where("status", "==", "active")
-    .orderBy("createdAt", "asc")
-    .onSnapshot((querySnapshot) => {
-      let activeItem = [];
-      querySnapshot.forEach((doc) => {
-        activeItem.push({ id: doc.id, ...doc.data() });
-        renderDocument(activeItem);
-        console.log(activeItem);
+    all.addEventListener("click", function handler() {
+      all.classList.add("filter-active");
+      filterActive.forEach((active) => {
+        active.classList.remove("filter-active");
       });
-    });
-}
-
-function completedFunction() {
-  db.collection("todos")
-    .where("status", "==", "completed")
-    .orderBy("createdAt", "asc")
-    .onSnapshot((querySnapshot) => {
-      let completedItem = [];
-      querySnapshot.forEach((doc) => {
-        completedItem.push({ id: doc.id, ...doc.data() });
-        renderDocument(completedItem);
+      filterComplete.forEach((complete) => {
+        complete.classList.remove("filter-active");
       });
+      allFunction();
+      console.log(this);
+      // this.removeEventListener("click", handler);
     });
-}
+  });
+
+  filterActive.forEach((active) => {
+    active.addEventListener("click", function handler() {
+      active.classList.add("filter-active");
+      filterAll.forEach((all) => {
+        all.classList.remove("filter-active");
+      });
+      filterComplete.forEach((complete) => {
+        complete.classList.remove("filter-active");
+      });
+
+      activeFunction();
+      console.log(this);
+      // this.removeEventListener("click", handler);
+    });
+  });
+
+  filterComplete.forEach((complete) => {
+    complete.addEventListener("click", function handler() {
+      complete.classList.add("filter-active");
+      filterAll.forEach((all) => {
+        all.classList.remove("filter-active");
+      });
+      filterActive.forEach((active) => {
+        active.classList.remove("filter-active");
+      });
+
+      completedFunction();
+      console.log(this);
+      // this.removeEventListener("click", handler);
+    });
+  });
+
+  function allFunction() {
+    getItemFromDatabase();
+  }
+
+  function activeFunction() {
+    db.collection("todos")
+      .where("status", "==", "active")
+      .orderBy("createdAt", "asc")
+      .onSnapshot((querySnapshot) => {
+        let activeItem = [];
+        querySnapshot.forEach((doc) => {
+          activeItem.push({ id: doc.id, ...doc.data() });
+          renderDocument(activeItem);
+          console.log(activeItem);
+        });
+      });
+  }
+
+  function completedFunction() {
+    db.collection("todos")
+      .where("status", "==", "completed")
+      .orderBy("createdAt", "asc")
+      .onSnapshot((querySnapshot) => {
+        let completedItem = [];
+        querySnapshot.forEach((doc) => {
+          completedItem.push({ id: doc.id, ...doc.data() });
+          renderDocument(completedItem);
+        });
+      });
+  }
+};
+
+filters();

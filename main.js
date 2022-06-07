@@ -118,7 +118,7 @@ function renderDocument(docItem) {
 function renderDefaultDocument() {
   let htmlElement = `<div>
     <div class="to-do-lists-filters">
-      <p class="to-do-items-left m-0 item-filter"> 0 item(s) left</p>
+      <p class="to-do-items-left m-0 item-filter"> 0 item left</p>
       <div class="to-do-filter-options-desktop">
         <div class="to-do-filter-all filter">All</div>
         <div class="to-do-filter-active filter">Active</div>
@@ -273,6 +273,7 @@ const filters = () => {
       .where("status", "==", "active")
       .orderBy("createdAt", "asc")
       .onSnapshot((querySnapshot) => {
+        if (querySnapshot.size === 0) return renderDefaultDocument();
         let activeItem = [];
         querySnapshot.forEach((doc) => {
           activeItem.push({ id: doc.id, ...doc.data() });
@@ -287,6 +288,7 @@ const filters = () => {
       .where("status", "==", "completed")
       .orderBy("createdAt", "asc")
       .onSnapshot((querySnapshot) => {
+        if (querySnapshot.size === 0) return renderDefaultDocument();
         let completedItem = [];
         querySnapshot.forEach((doc) => {
           completedItem.push({ id: doc.id, ...doc.data() });

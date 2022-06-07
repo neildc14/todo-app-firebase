@@ -165,12 +165,16 @@ function completedItem(id) {
         });
 
         getItemFromDatabase();
+        activeFunction();
+        completedFunction();
       } else if (status === "completed") {
         toDosRef.update({
           status: "active",
         });
 
         getItemFromDatabase();
+        activeFunction();
+        completedFunction();
       }
     }
   });
@@ -194,55 +198,51 @@ function clearCompleted() {
     });
 }
 
-const filters = () => {
-  let filterAll = document.querySelectorAll(".to-do-filter-all");
-  let filterActive = document.querySelectorAll(".to-do-filter-active");
-  let filterComplete = document.querySelectorAll(".to-do-filter-complete");
+let filterAll = document.querySelectorAll(".to-do-filter-all");
+let filterActive = document.querySelectorAll(".to-do-filter-active");
+let filterComplete = document.querySelectorAll(".to-do-filter-complete");
 
-  filterAll.forEach((all) => {
+filterAll.forEach((all) => {
+  all.classList.add("filter-active");
+  all.addEventListener("click", function () {
     all.classList.add("filter-active");
-    all.addEventListener("click", function () {
-      all.classList.add("filter-active");
-      filterActive.forEach((active) => {
-        active.classList.remove("filter-active");
-      });
-      filterComplete.forEach((complete) => {
-        complete.classList.remove("filter-active");
-      });
-
-      allFunction();
+    filterActive.forEach((active) => {
+      active.classList.remove("filter-active");
     });
-  });
-
-  filterActive.forEach((active) => {
-    active.addEventListener("click", function () {
-      active.classList.add("filter-active");
-      filterAll.forEach((all) => {
-        all.classList.remove("filter-active");
-      });
-      filterComplete.forEach((complete) => {
-        complete.classList.remove("filter-active");
-      });
-
-      activeFunction();
+    filterComplete.forEach((complete) => {
+      complete.classList.remove("filter-active");
     });
-  });
 
-  filterComplete.forEach((complete) => {
-    complete.addEventListener("click", function () {
-      complete.classList.add("filter-active");
-      filterAll.forEach((all) => {
-        all.classList.remove("filter-active");
-      });
-      filterActive.forEach((active) => {
-        active.classList.remove("filter-active");
-      });
-      completedFunction();
+    allFunction();
+  });
+});
+
+filterActive.forEach((active) => {
+  active.addEventListener("click", function () {
+    active.classList.add("filter-active");
+    filterAll.forEach((all) => {
+      all.classList.remove("filter-active");
     });
-  });
-};
+    filterComplete.forEach((complete) => {
+      complete.classList.remove("filter-active");
+    });
 
-filters();
+    activeFunction();
+  });
+});
+
+filterComplete.forEach((complete) => {
+  complete.addEventListener("click", function () {
+    complete.classList.add("filter-active");
+    filterAll.forEach((all) => {
+      all.classList.remove("filter-active");
+    });
+    filterActive.forEach((active) => {
+      active.classList.remove("filter-active");
+    });
+    completedFunction();
+  });
+});
 
 function allFunction() {
   getItemFromDatabase();
@@ -257,6 +257,7 @@ function activeFunction() {
       querySnapshot.forEach((doc) => {
         activeItem.push({ id: doc.id, ...doc.data() });
         renderDocument(activeItem);
+        console.log(activeItem);
       });
     });
 }

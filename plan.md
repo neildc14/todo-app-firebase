@@ -24,3 +24,5 @@ if clear then it ask if the user is sure to delete and then when the prompt pops
 //the item left indicator counts all the active in array
 
 filter must be equal to current filter so that when the dom rerenders, the currentfilter changes in the background
+
+if filter == completed then render only the length of items todo

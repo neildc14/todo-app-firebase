@@ -46,7 +46,6 @@ function addNewToDo(event) {
       });
 
     inputNewToDo.value = "";
-    getItemFromDatabase();
   }
 }
 
@@ -57,11 +56,13 @@ function getItemFromDatabase() {
     .orderBy("createdAt", "asc")
     .onSnapshot((querySnapshot) => {
       if (querySnapshot.size === 0) return renderDefaultDocument();
-      let docItems = [];
-      querySnapshot.forEach((doc) => {
-        docItems.push({ id: doc.id, ...doc.data() });
-        return renderDocument(docItems);
-      });
+      if (querySnapshot.size !== 0 || querySnapshot.size > 0) {
+        let docItems = [];
+        querySnapshot.forEach((doc) => {
+          docItems.push({ id: doc.id, ...doc.data() });
+          return renderDocument(docItems);
+        });
+      }
     });
 }
 
@@ -70,7 +71,7 @@ getItemFromDatabase();
 function renderDocument(docItem) {
   let htmlElement = "<div>";
   let completed = [];
-
+  console.log("js is inevitable");
   docItem.map((doc) => {
     if (doc.status === "completed") {
       completed.push(doc);
@@ -124,9 +125,9 @@ function renderDefaultDocument() {
     <div class="to-do-lists-filters">
       <p class="to-do-items-left m-0 item-filter"> 0 item left</p>
       <div class="to-do-filter-options-desktop">
-        <div class="to-do-filter-all filter">All</div>
-        <div class="to-do-filter-active filter">Active</div>
-        <div class="to-do-filter-complete filter">Completed</div>
+        <div class="filter">All</div>
+        <div class="filter">Active</div>
+        <div class="filter">Completed</div>
       </div>
       <div class="to-do-filter-clear-completed item-filter">
         Clear Completed
@@ -144,20 +145,23 @@ const createEventListeners = () => {
   );
 
   closeBtns.forEach((closeBtn) => {
-    closeBtn.addEventListener("click", () => {
+    closeBtn.addEventListener("click", function handler() {
       deleteItem(closeBtn.dataset.id);
+      this.removeEventListener("click", handler);
     });
   });
 
   checkMarksBtn.forEach((checkMark) => {
-    checkMark.addEventListener("click", () => {
+    checkMark.addEventListener("click", function handlerListener() {
       completedItem(checkMark.dataset.id);
+      this.removeEventListener("click", handlerListener);
     });
   });
 
   clearCompleteBtn.forEach((clearComplete) => {
-    clearComplete.addEventListener("click", () => {
+    clearComplete.addEventListener("click", function handlerListener() {
       clearCompleted();
+      this.removeEventListener("click", handlerListener);
     });
   });
 };
@@ -168,7 +172,7 @@ function deleteItem(id) {
     .delete()
     .then(() => {
       console.log("Document successfully deleted!");
-      getItemFromDatabase();
+      // getItemFromDatabase();
     })
     .catch((error) => {
       console.error("Error removing document: ", error);
@@ -190,7 +194,7 @@ function completedItem(id) {
 
         filterActivated.forEach((filter) => {
           if (filter.classList.contains("to-do-filter-all"))
-            return allFunction();
+            return getItemFromDatabase();
           if (filter.classList.contains("to-do-filter-active"))
             return activeFunction();
           if (filter.classList.contains("to-do-filter-complete"))
@@ -203,7 +207,7 @@ function completedItem(id) {
 
         filterActivated.forEach((filter) => {
           if (filter.classList.contains("to-do-filter-all"))
-            return allFunction();
+            return getItemFromDatabase();
           if (filter.classList.contains("to-do-filter-active"))
             return activeFunction();
           if (filter.classList.contains("to-do-filter-complete"))
@@ -225,7 +229,7 @@ function clearCompleted() {
     })
     .then(() => {
       console.log("Clear Successful");
-      getItemFromDatabase();
+      // getItemFromDatabase();
     })
     .catch((error) => {
       console.log("Error getting documents: ", error);
@@ -242,7 +246,7 @@ filterAll.forEach((all) => {
     filterComplete.forEach((complete) => {
       complete.classList.remove("filter-active");
     });
-    allFunction();
+    getItemFromDatabase();
   });
 });
 
@@ -274,21 +278,19 @@ filterComplete.forEach((complete) => {
   });
 });
 
-function allFunction() {
-  getItemFromDatabase();
-}
-
 function activeFunction() {
   db.collection("todos")
     .where("status", "==", "active")
     .orderBy("createdAt", "asc")
     .onSnapshot((querySnapshot) => {
       if (querySnapshot.size === 0) return renderDefaultDocument();
-      let activeItem = [];
-      querySnapshot.forEach((doc) => {
-        activeItem.push({ id: doc.id, ...doc.data() });
-        renderDocument(activeItem);
-      });
+      if (querySnapshot.size !== 0 || querySnapshot.size > 0) {
+        let activeItem = [];
+        querySnapshot.forEach((doc) => {
+          activeItem.push({ id: doc.id, ...doc.data() });
+          renderDocument(activeItem);
+        });
+      }
     });
 }
 
@@ -298,10 +300,12 @@ function completedFunction() {
     .orderBy("createdAt", "asc")
     .onSnapshot((querySnapshot) => {
       if (querySnapshot.size === 0) return renderDefaultDocument();
-      let completedItem = [];
-      querySnapshot.forEach((doc) => {
-        completedItem.push({ id: doc.id, ...doc.data() });
-        renderDocument(completedItem);
-      });
+      if (querySnapshot.size !== 0 || querySnapshot.size > 0) {
+        let completedItem = [];
+        querySnapshot.forEach((doc) => {
+          completedItem.push({ id: doc.id, ...doc.data() });
+          renderDocument(completedItem);
+        });
+      }
     });
 }

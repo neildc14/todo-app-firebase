@@ -22,3 +22,5 @@ if clear then it ask if the user is sure to delete and then when the prompt pops
 - create an array that add all the compeleted lists and then compare it to the localstorage to delete all using filters ig uess
 
 //the item left indicator counts all the active in array
+
+filter must be equal to current filter so that when the dom rerenders, the currentfilter changes in the background

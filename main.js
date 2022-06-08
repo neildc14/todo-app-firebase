@@ -4,10 +4,13 @@ let body = document.querySelector("body");
 let header = document.querySelector("header");
 let toDoLists = document.getElementById("toDoLists");
 let todoListBracket = document.getElementById("odoListBracket");
-let warningText = document.getElementById("warningText");
-let inputNewToDo = document.getElementById("inputNewToDo");
 
-/*themprovider */
+let inputNewToDo = document.getElementById("inputNewToDo");
+let filterAll = document.querySelectorAll(".to-do-filter-all");
+let filterActive = document.querySelectorAll(".to-do-filter-active");
+let filterComplete = document.querySelectorAll(".to-do-filter-complete");
+
+/*themeprovider */
 themeProviderBtn.addEventListener("click", themeProviderFunc);
 
 function themeProviderFunc() {
@@ -43,6 +46,7 @@ function addNewToDo(event) {
       });
 
     inputNewToDo.value = "";
+    getItemFromDatabase();
   }
 }
 
@@ -164,6 +168,7 @@ function deleteItem(id) {
     .delete()
     .then(() => {
       console.log("Document successfully deleted!");
+      getItemFromDatabase();
     })
     .catch((error) => {
       console.error("Error removing document: ", error);
@@ -171,6 +176,8 @@ function deleteItem(id) {
 }
 
 function completedItem(id) {
+  let filterActivated = document.querySelectorAll(".filter-active");
+
   var toDosRef = db.collection("todos").doc(id);
   toDosRef.get().then((doc) => {
     if (doc.exists) {
@@ -181,13 +188,27 @@ function completedItem(id) {
           status: "completed",
         });
 
-        filters();
+        filterActivated.forEach((filter) => {
+          if (filter.classList.contains("to-do-filter-all"))
+            return allFunction();
+          if (filter.classList.contains("to-do-filter-active"))
+            return activeFunction();
+          if (filter.classList.contains("to-do-filter-complete"))
+            return completedFunction();
+        });
       } else if (status === "completed") {
         toDosRef.update({
           status: "active",
         });
 
-        filters();
+        filterActivated.forEach((filter) => {
+          if (filter.classList.contains("to-do-filter-all"))
+            return allFunction();
+          if (filter.classList.contains("to-do-filter-active"))
+            return activeFunction();
+          if (filter.classList.contains("to-do-filter-complete"))
+            return completedFunction();
+        });
       }
     }
   });
@@ -211,91 +232,76 @@ function clearCompleted() {
     });
 }
 
-const filters = () => {
-  let filterAll = document.querySelectorAll(".to-do-filter-all");
-  let filterActive = document.querySelectorAll(".to-do-filter-active");
-  let filterComplete = document.querySelectorAll(".to-do-filter-complete");
-
-  filterAll.forEach((all) => {
+filterAll.forEach((all) => {
+  all.classList.add("filter-active");
+  all.addEventListener("click", function () {
     all.classList.add("filter-active");
-    all.addEventListener("click", function handler() {
-      all.classList.add("filter-active");
-      filterActive.forEach((active) => {
-        active.classList.remove("filter-active");
-      });
-      filterComplete.forEach((complete) => {
-        complete.classList.remove("filter-active");
-      });
-      allFunction();
-      console.log(this);
-      // this.removeEventListener("click", handler);
+    filterActive.forEach((active) => {
+      active.classList.remove("filter-active");
     });
-  });
-
-  filterActive.forEach((active) => {
-    active.addEventListener("click", function handler() {
-      active.classList.add("filter-active");
-      filterAll.forEach((all) => {
-        all.classList.remove("filter-active");
-      });
-      filterComplete.forEach((complete) => {
-        complete.classList.remove("filter-active");
-      });
-
-      activeFunction();
-      console.log(this);
-      // this.removeEventListener("click", handler);
+    filterComplete.forEach((complete) => {
+      complete.classList.remove("filter-active");
     });
+    allFunction();
   });
+});
 
-  filterComplete.forEach((complete) => {
-    complete.addEventListener("click", function handler() {
-      complete.classList.add("filter-active");
-      filterAll.forEach((all) => {
-        all.classList.remove("filter-active");
-      });
-      filterActive.forEach((active) => {
-        active.classList.remove("filter-active");
-      });
-
-      completedFunction();
-      console.log(this);
-      // this.removeEventListener("click", handler);
+filterActive.forEach((active) => {
+  active.addEventListener("click", function () {
+    active.classList.add("filter-active");
+    filterAll.forEach((all) => {
+      all.classList.remove("filter-active");
     });
+    filterComplete.forEach((complete) => {
+      complete.classList.remove("filter-active");
+    });
+
+    activeFunction();
   });
+});
 
-  function allFunction() {
-    getItemFromDatabase();
-  }
+filterComplete.forEach((complete) => {
+  complete.addEventListener("click", function () {
+    complete.classList.add("filter-active");
+    filterAll.forEach((all) => {
+      all.classList.remove("filter-active");
+    });
+    filterActive.forEach((active) => {
+      active.classList.remove("filter-active");
+    });
 
-  function activeFunction() {
-    db.collection("todos")
-      .where("status", "==", "active")
-      .orderBy("createdAt", "asc")
-      .onSnapshot((querySnapshot) => {
-        if (querySnapshot.size === 0) return renderDefaultDocument();
-        let activeItem = [];
-        querySnapshot.forEach((doc) => {
-          activeItem.push({ id: doc.id, ...doc.data() });
-          renderDocument(activeItem);
-          console.log(activeItem);
-        });
+    completedFunction();
+  });
+});
+
+function allFunction() {
+  getItemFromDatabase();
+}
+
+function activeFunction() {
+  db.collection("todos")
+    .where("status", "==", "active")
+    .orderBy("createdAt", "asc")
+    .onSnapshot((querySnapshot) => {
+      if (querySnapshot.size === 0) return renderDefaultDocument();
+      let activeItem = [];
+      querySnapshot.forEach((doc) => {
+        activeItem.push({ id: doc.id, ...doc.data() });
+        renderDocument(activeItem);
       });
-  }
+    });
+}
 
-  function completedFunction() {
-    db.collection("todos")
-      .where("status", "==", "completed")
-      .orderBy("createdAt", "asc")
-      .onSnapshot((querySnapshot) => {
-        if (querySnapshot.size === 0) return renderDefaultDocument();
-        let completedItem = [];
-        querySnapshot.forEach((doc) => {
-          completedItem.push({ id: doc.id, ...doc.data() });
-          renderDocument(completedItem);
-        });
+function completedFunction() {
+  db.collection("todos")
+    .where("status", "==", "completed")
+    .orderBy("createdAt", "asc")
+    .onSnapshot((querySnapshot) => {
+      if (querySnapshot.size === 0) return renderDefaultDocument();
+      let completedItem = [];
+      querySnapshot.forEach((doc) => {
+        completedItem.push({ id: doc.id, ...doc.data() });
+        renderDocument(completedItem);
       });
-  }
-};
-
-filters();
+    });
+}

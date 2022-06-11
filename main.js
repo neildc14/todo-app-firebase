@@ -10,6 +10,8 @@ let filterAll = document.querySelectorAll(".to-do-filter-all");
 let filterActive = document.querySelectorAll(".to-do-filter-active");
 let filterComplete = document.querySelectorAll(".to-do-filter-complete");
 
+//imports
+import renderDefaultDocument from "./render.js";
 /*themeprovider */
 themeProviderBtn.addEventListener("click", themeProviderFunc);
 
@@ -120,23 +122,6 @@ function renderDocument(docItem) {
   createEventListeners();
 }
 
-function renderDefaultDocument() {
-  let htmlElement = `<div>
-    <div class="to-do-lists-filters">
-      <p class="to-do-items-left m-0 item-filter"> 0 item left</p>
-      <div class="to-do-filter-options-desktop">
-        <div class="filter">All</div>
-        <div class="filter">Active</div>
-        <div class="filter">Completed</div>
-      </div>
-      <div class="to-do-filter-clear-completed item-filter">
-        Clear Completed
-      </div>
-    </div>
-  </div>`;
-  toDoLists.innerHTML = htmlElement;
-}
-
 const createEventListeners = () => {
   let closeBtns = document.querySelectorAll(".close-button");
   let checkMarksBtn = document.querySelectorAll(".checkbox");
@@ -180,8 +165,6 @@ function deleteItem(id) {
 }
 
 function completedItem(id) {
-  let filterActivated = document.querySelectorAll(".filter-active");
-
   var toDosRef = db.collection("todos").doc(id);
   toDosRef.get().then((doc) => {
     if (doc.exists) {
@@ -192,29 +175,27 @@ function completedItem(id) {
           status: "completed",
         });
 
-        filterActivated.forEach((filter) => {
-          if (filter.classList.contains("to-do-filter-all"))
-            return getItemFromDatabase();
-          if (filter.classList.contains("to-do-filter-active"))
-            return activeFunction();
-          if (filter.classList.contains("to-do-filter-complete"))
-            return completedFunction();
-        });
+        filterActivated();
       } else if (status === "completed") {
         toDosRef.update({
           status: "active",
         });
 
-        filterActivated.forEach((filter) => {
-          if (filter.classList.contains("to-do-filter-all"))
-            return getItemFromDatabase();
-          if (filter.classList.contains("to-do-filter-active"))
-            return activeFunction();
-          if (filter.classList.contains("to-do-filter-complete"))
-            return completedFunction();
-        });
+        filterActivated();
       }
     }
+  });
+}
+
+function filterActivated() {
+  let filterActivated = document.querySelectorAll(".filter-active");
+  filterActivated.forEach((filter) => {
+    if (filter.classList.contains("to-do-filter-all"))
+      return getItemFromDatabase();
+    if (filter.classList.contains("to-do-filter-active"))
+      return activeFunction();
+    if (filter.classList.contains("to-do-filter-complete"))
+      return completedFunction();
   });
 }
 
@@ -229,7 +210,6 @@ function clearCompleted() {
     })
     .then(() => {
       console.log("Clear Successful");
-      // getItemFromDatabase();
     })
     .catch((error) => {
       console.log("Error getting documents: ", error);
@@ -279,32 +259,25 @@ filterComplete.forEach((complete) => {
 });
 
 function activeFunction() {
-  db.collection("todos")
-    .where("status", "==", "active")
-    .orderBy("createdAt", "asc")
-    .onSnapshot((querySnapshot) => {
-      if (querySnapshot.size === 0) return renderDefaultDocument();
-      if (querySnapshot.size !== 0 || querySnapshot.size > 0) {
-        let activeItem = [];
-        querySnapshot.forEach((doc) => {
-          activeItem.push({ id: doc.id, ...doc.data() });
-          renderDocument(activeItem);
-        });
-      }
-    });
+  getDBCollection("active");
 }
 
 function completedFunction() {
+  getDBCollection("completed");
+}
+
+//facade design pattern
+function getDBCollection(status) {
   db.collection("todos")
-    .where("status", "==", "completed")
+    .where("status", "==", status)
     .orderBy("createdAt", "asc")
     .onSnapshot((querySnapshot) => {
       if (querySnapshot.size === 0) return renderDefaultDocument();
-      if (querySnapshot.size !== 0 || querySnapshot.size > 0) {
-        let completedItem = [];
+      if (querySnapshot.size !== 0 && querySnapshot.size > 0) {
+        let collectionItem = [];
         querySnapshot.forEach((doc) => {
-          completedItem.push({ id: doc.id, ...doc.data() });
-          renderDocument(completedItem);
+          collectionItem.push({ id: doc.id, ...doc.data() });
+          renderDocument(collectionItem);
         });
       }
     });

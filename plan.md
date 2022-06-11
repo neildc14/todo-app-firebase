@@ -26,3 +26,12 @@ if clear then it ask if the user is sure to delete and then when the prompt pops
 filter must be equal to current filter so that when the dom rerenders, the currentfilter changes in the background
 
 if filter == completed then render only the length of items todo
+
+if (doc.status === "completed") {
+counter = completed.length;
+} else if (doc.status === "active") {
+counter = docItem.length;
+completed.push(doc);
+} else {
+counter = docItem.length - completed.length;
+}

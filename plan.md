@@ -35,3 +35,5 @@ completed.push(doc);
 } else {
 counter = docItem.length - completed.length;
 }
+
+the filter completed must be modified and does not perform server side rendering

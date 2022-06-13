@@ -73,17 +73,19 @@ getItemFromDatabase();
 function renderDocument(docItem) {
   let htmlElement = "<div>";
   let completed = [];
-  console.log("js is inevitable");
+
   docItem.map((doc) => {
     if (doc.status === "completed") {
       completed.push(doc);
     }
 
-    htmlElement += `<div class="to-do-list"
+    htmlElement += `<div class="to-do-list ${
+      doc.status == "completed" ? "complete" : "active"
+    }"
     id="todoListBracket">
       <div class="checkbox-container">
         <div class="checkbox ${
-          doc.status == "completed" ? "check-filled" : ""
+          doc.status == "completed" ? "check-filled" : "active"
         }" data-id=${doc.id}>
           <img
             src="images/icon-check.svg"
@@ -92,8 +94,8 @@ function renderDocument(docItem) {
         </div>
       </div> 
       <div class="to-do-text  ${
-        doc.status == "completed" ? "check-text" : ""
-      }" data-check="incomplete">
+        doc.status == "completed" ? "check-text" : "active"
+      }">
       ${doc.todo}</div>
       <div class="close-button-container">
         <div class="close-button" data-id=${doc.id}>
@@ -169,7 +171,7 @@ function completedItem(id) {
   toDosRef.get().then((doc) => {
     if (doc.exists) {
       let status = doc.data().status;
-
+      console.log(doc.data());
       if (status === "active") {
         toDosRef.update({
           status: "completed",
@@ -189,14 +191,15 @@ function completedItem(id) {
 
 function filterActivated() {
   let filterActivated = document.querySelectorAll(".filter-active");
-  filterActivated.forEach((filter) => {
-    if (filter.classList.contains("to-do-filter-all"))
-      return getItemFromDatabase();
-    if (filter.classList.contains("to-do-filter-active"))
-      return activeFunction();
-    if (filter.classList.contains("to-do-filter-complete"))
-      return completedFunction();
-  });
+  console.log(filterActivated[0]);
+
+  if (filterActivated[0].classList.contains("to-do-filter-all"))
+    return getItemFromDatabase();
+  if (filterActivated[0].classList.contains("to-do-filter-active"))
+    return activeFunction();
+
+  if (filterActivated[0].classList.contains("to-do-filter-complete"))
+    return completedFunction();
 }
 
 function clearCompleted() {
@@ -259,26 +262,40 @@ filterComplete.forEach((complete) => {
 });
 
 function activeFunction() {
-  getDBCollection("active");
+  // getDBCollection("active");
+
+  setFilter("complete");
 }
 
 function completedFunction() {
-  getDBCollection("completed");
+  // getDBCollection("completed");
+  setFilter("active");
 }
 
 //facade design pattern
-function getDBCollection(status) {
-  db.collection("todos")
-    .where("status", "==", status)
-    .orderBy("createdAt", "asc")
-    .onSnapshot((querySnapshot) => {
-      if (querySnapshot.size === 0) return renderDefaultDocument();
-      if (querySnapshot.size !== 0 && querySnapshot.size > 0) {
-        let collectionItem = [];
-        querySnapshot.forEach((doc) => {
-          collectionItem.push({ id: doc.id, ...doc.data() });
-          renderDocument(collectionItem);
-        });
-      }
-    });
+// function getDBCollection(status) {
+//   db.collection("todos")
+//     .where("status", "==", status)
+//     .orderBy("createdAt", "asc")
+//     .onSnapshot((querySnapshot) => {
+//       if (querySnapshot.size === 0) return renderDefaultDocument();
+//       if (querySnapshot.size !== 0 && querySnapshot.size > 0) {
+//         let collectionItem = [];
+//         querySnapshot.forEach((doc) => {
+//           collectionItem.push({ id: doc.id, ...doc.data() });
+//           renderDocument(collectionItem);
+//         });
+//       }
+//     });
+// }
+
+function setFilter(filterType) {
+  let todoList = document.querySelectorAll(".to-do-list");
+  todoList.forEach((todo) => {
+    if (todo.classList.contains(filterType)) {
+      todo.classList.add("remove");
+    } else {
+      todo.classList.remove("remove");
+    }
+  });
 }
